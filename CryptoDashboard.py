@@ -209,7 +209,6 @@ def hwg():
 # "ath_date":"2017-12-20T00:00:00.000Z"
 # "atl":0.213899
 # "atl_change_percentage":36312.62015
-# "atl_date":"2014-02-14T00:00:00.000Z"
 # "roi":null
 # "last_updated":"2020-09-03T13:06:04.156Z"
 			
@@ -232,7 +231,7 @@ def hwg():
 		pricespec1 = float(loads(urlopen('https://api.coingecko.com/api/v3/coins/' + specialcoin1).read())['market_data']['current_price']['usd'])
 		pricespec2 = float(loads(urlopen('https://api.coingecko.com/api/v3/coins/' + specialcoin2).read())['market_data']['current_price']['usd'])
 	except:
-		print("Error reading Coin URL", specialcoin)
+		print("Error reading Coin URL", specialcoin1)
 
 	try:
 #	get the fearindex
