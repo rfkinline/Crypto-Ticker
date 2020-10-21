@@ -22,11 +22,9 @@ for transaction in result:
 	real_value = value * 10 ** (decimals * -1)
 	if tx_to == address.lower():
 		eth_token_totals[token_name] += real_value
-
 	else:
 		eth_token_totals[token_name] += (real_value * -1)
 
-#	df.at[toke_name,'newcol']=value
 for token_name in eth_token_totals:
 	if eth_token_totals[token_name] > 0.00001:
 		print(token_name, eth_token_totals[token_name])
