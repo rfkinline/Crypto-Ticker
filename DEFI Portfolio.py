@@ -46,29 +46,31 @@ for token_symbol in eth_token_totals:
 			if token['symbol'].lower() == symbol_lower:
 #					pricetoken = float(loads(urlopen('https://min-api.cryptocompare.com/data/price?fsym='+ symbol_lower +'&tsyms=BTC,USD,EU').read())['USD'])
 				pricetokenunit = float(loads(urlopen('https://api.coingecko.com/api/v3/coins/' + token['id']).read())['market_data']['current_price']['usd'])
+
+# not allways 100%, For example BLZ and contract 0x62450755160E9347DcF947da31AcC841E9668443 Iscariot (BLZ). Price should be 0
 				
 		pricetoken=pricetokenunit*eth_token_totals[token_symbol]
 		currency = "${:,.2f}".format(pricetoken)
 		print(token_symbol,eth_token_totals[token_symbol], currency)
 
 
-		[{"blockNumber":"10451980",
-		"timeStamp":"1594653491",
-		"hash":"0x2b72e1e454ef895ddee5da46ec2a154a7460692d316fe87d15e2fab7bb1e4070",
-		"nonce":"0",
-		"blockHash":"0x1b28b88e744ffec253b91d68066295b7a1c9adb9b8046f22b027b06acb0184ae",
-		"from":"0x03f2c52f1cd2043af5ad4b9c16b689b2b28bd8ac",
-		"contractAddress":"0x0000000000004946c0e9f43f4dee607b0ef1fa1c",
-		"to":"0x0000000000000000000000000000000000000000",
-		"value":"0",
-		"tokenName":"Chi Gastoken by 1inch",
-		"tokenSymbol":"CHI",
-		"tokenDecimal":"0",
-		"transactionIndex":"148",
-		"gas":"659066",
-		"gasPrice":"73650000000",
-		"gasUsed":"402508",
-		"cumulativeGasUsed":"9759222",
-		"input":"deprecated",
-		"confirmations":"655728"},
-		print(transaction.get("gas"),transaction.get("gasPrice"),transaction.get("gasUsed"),transaction.get("cumulativeGasUsed"),transaction.get("timeStamp"), "R")
+	#	[{"blockNumber":"10451980",
+	#	"timeStamp":"1594653491",
+	#	"hash":"0x2b72e1e454ef895ddee5da46ec2a154a7460692d316fe87d15e2fab7bb1e4070",
+	#	"nonce":"0",
+	#	"blockHash":"0x1b28b88e744ffec253b91d68066295b7a1c9adb9b8046f22b027b06acb0184ae",
+	#	"from":"0x03f2c52f1cd2043af5ad4b9c16b689b2b28bd8ac",
+	#	"contractAddress":"0x0000000000004946c0e9f43f4dee607b0ef1fa1c",
+	#	"to":"0x0000000000000000000000000000000000000000",
+	#	"value":"0",
+	#	"tokenName":"Chi Gastoken by 1inch",
+	#	"tokenSymbol":"CHI",
+	#	"tokenDecimal":"0",
+	#	"transactionIndex":"148",
+	#	"gas":"659066",
+	#	"gasPrice":"73650000000",
+	#	"gasUsed":"402508",
+	#	"cumulativeGasUsed":"9759222",
+	#	"input":"deprecated",
+	#	"confirmations":"655728"},
+	#	print(transaction.get("gas"),transaction.get("gasPrice"),transaction.get("gasUsed"),transaction.get("cumulativeGasUsed"),transaction.get("timeStamp"), "R")
