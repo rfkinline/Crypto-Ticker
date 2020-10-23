@@ -2,17 +2,13 @@
 #!/usr/bin/env python3
 from urllib.request import urlopen
 import requests
-from collections import defaultdict
 from json import loads
+import pandas as pd
 
-eth_token_totals = defaultdict(lambda : 0)
-#address ='0x9ec5e68f807b56befed7d99e9fcec6111845e7b7'
-address='0x03F2C52f1Cd2043AF5AD4B9C16B689B2B28bD8Ac'
+address ='0x9ec5e68f807b56befed7d99e9fcec6111845e7b7'
 
-url = 'https://api.coingecko.com/api/v3/coins/list'
-response = requests.get(url)
-pricejson = response.json()
 
+df = pd.DataFrame() #columns=['contractAddress','token_symbol', 'value'])
 
 url = 'https://api.etherscan.io/api?module=account&action=tokentx&address='+address+'&startblock=0&endblock=999999999&sort=asc&apikey=YourApiKeyToken'
 response = requests.get(url)
@@ -21,6 +17,7 @@ result = address_content.get("result")
 for transaction in result:
 	tx_from = transaction.get("from")
 	tx_to = transaction.get("to")
+	contractAddress = transaction.get("contractAddress")
 	value = int(transaction.get("value"))
 	decimals = int(transaction.get("tokenDecimal"))
 	token_name = transaction.get("tokenName")
@@ -30,30 +27,33 @@ for transaction in result:
 	gasprice=gasused/1000000000*gasprice/1000000000
 	real_value = value * 10 ** (decimals * -1)
 	if tx_to == address.lower():
-		eth_token_totals[token_symbol] += real_value
-		gasprice+=gasprice
+		real_value = real_value
 	else:
-		eth_token_totals[token_symbol] += (real_value * -1)
-		gasprice+=gasprice
+		real_value = (real_value * -1)
+	df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol, 'real_value':real_value}, ignore_index=True)
+
 #	symbol=DAI name=Dai Stablecoin
 #'id': 'zulu-republic-token', 'symbol': 'ztx', 'name': 'Zulu Republic Token'
-	print(token_name, gasprice)
-for token_symbol in eth_token_totals:
-	if eth_token_totals[token_symbol] > 0.00001:
-		pricetoken=0
-		symbol_lower = token_symbol.lower()
-		for token in pricejson:
-			if token['symbol'].lower() == symbol_lower:
-#					pricetoken = float(loads(urlopen('https://min-api.cryptocompare.com/data/price?fsym='+ symbol_lower +'&tsyms=BTC,USD,EU').read())['USD'])
-				pricetokenunit = float(loads(urlopen('https://api.coingecko.com/api/v3/coins/' + token['id']).read())['market_data']['current_price']['usd'])
+df=df.groupby(['token_symbol','contractAddress'],as_index=False).agg(sum)
 
+#problem tokens: AMPL and SoftLink
+
+for i in range(len(df)) :
+#	print(df.loc[i,"contractAddress"])
+	if df.loc[i,"real_value"] > 0.00001:
+		pricetokenunit=0
+		try:
+			pricetokenunit = float(loads(urlopen('https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=' + df.loc[i,"contractAddress"] +'&vs_currencies=usd').read())[df.loc[i,"contractAddress"]]['usd'])
+		except:
+			pricetokenunit=0
 # not allways 100%, For example BLZ and contract 0x62450755160E9347DcF947da31AcC841E9668443 Iscariot (BLZ). Price should be 0
-				
-		pricetoken=pricetokenunit*eth_token_totals[token_symbol]
+		
+		pricetoken=pricetokenunit * df.loc[i,"real_value"]
 		currency = "${:,.2f}".format(pricetoken)
-		print(token_symbol,eth_token_totals[token_symbol], currency)
+		print(df.loc[i,"token_symbol"],df.loc[i,"real_value"], currency)
 
 
+#	print(df.loc[i,"contractAddress"])
 	#	[{"blockNumber":"10451980",
 	#	"timeStamp":"1594653491",
 	#	"hash":"0x2b72e1e454ef895ddee5da46ec2a154a7460692d316fe87d15e2fab7bb1e4070",
