@@ -10,6 +10,15 @@ address='0x03F2C52f1Cd2043AF5AD4B9C16B689B2B28bD8Ac'
 
 df = pd.DataFrame() #columns=['contractAddress','token_symbol', 'value'])
 
+url = 'https://api.etherscan.io/api?module=account&action=balance&address='+address+'&tag=latest&apikey=YourApiKeyToken'
+response = requests.get(url).json()
+value = int(response['result'])
+contractAddress = address
+token_name = "Ethereum"
+token_symbol = "ETH"
+real_value = value / 1000000000000000000
+df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol, 'real_value':real_value}, ignore_index=True)
+
 url = 'https://api.etherscan.io/api?module=account&action=tokentx&address='+address+'&startblock=0&endblock=999999999&sort=asc&apikey=YourApiKeyToken'
 response = requests.get(url)
 address_content = response.json()
@@ -37,6 +46,7 @@ for transaction in result:
 df=df.groupby(['token_symbol','contractAddress'],as_index=False).agg(sum)
 
 #problem tokens: AMPL and SoftLink
+#HEX2T not value in etherscan
 
 for i in range(len(df)) :
 #	print(df.loc[i,"contractAddress"])
