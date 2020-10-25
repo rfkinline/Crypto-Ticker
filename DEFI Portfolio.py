@@ -12,34 +12,39 @@ df = pd.DataFrame() #columns=['contractAddress','token_symbol', 'value'])
 
 url = 'https://api.etherscan.io/api?module=account&action=balance&address='+address+'&tag=latest&apikey=YourApiKeyToken'
 response = requests.get(url).json()
-value = int(response['result'])
-contractAddress = address
-token_name = "Ethereum"
-token_symbol = "ETH"
-real_value = value / 1000000000000000000
-df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol, 'real_value':real_value}, ignore_index=True)
+status = requests.get(url).status_code
+if status == 200:
+	value = int(response['result'])
+	contractAddress = address
+	token_name = "Ethereum"
+	token_symbol = "ETH"
+	real_value = value / 1000000000000000000
+	df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol, 'real_value':real_value}, ignore_index=True)
 
 url = 'https://api.etherscan.io/api?module=account&action=tokentx&address='+address+'&startblock=0&endblock=999999999&sort=asc&apikey=YourApiKeyToken'
 response = requests.get(url)
-address_content = response.json()
-result = address_content.get("result")
-for transaction in result:
-	tx_from = transaction.get("from")
-	tx_to = transaction.get("to")
-	contractAddress = transaction.get("contractAddress")
-	value = int(transaction.get("value"))
-	decimals = int(transaction.get("tokenDecimal"))
-	token_name = transaction.get("tokenName")
-	token_symbol = transaction.get("tokenSymbol")
-	gasprice = int(transaction.get("gasPrice"))
-	gasused = int(transaction.get("gasUsed"))
-	gasfee=gasused/1000000000*gasprice/1000000000
-	real_value = value * 10 ** (decimals * -1)
-	if tx_to == address.lower():
-		real_value = real_value
-	else:
-		real_value = (real_value * -1)
-	df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol, 'real_value':real_value}, ignore_index=True)
+status = requests.get(url).status_code
+if status == 200:
+	address_content = response.json()
+	result = address_content.get("result")
+	for transaction in result:
+		tx_from = transaction.get("from")
+		tx_to = transaction.get("to")
+		contractAddress = transaction.get("contractAddress")
+		value = int(transaction.get("value"))
+		decimals = int(transaction.get("tokenDecimal"))
+		token_name = transaction.get("tokenName")
+		token_symbol = transaction.get("tokenSymbol")
+		gasprice = int(transaction.get("gasPrice"))
+		gasused = int(transaction.get("gasUsed"))
+		gasfee=gasused/1000000000*gasprice/1000000000
+		real_value = value * 10 ** (decimals * -1)
+		if tx_to == address.lower():
+			real_value = real_value
+		else:
+			real_value = (real_value * -1)
+		df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol, 'real_value':real_value}, ignore_index=True)
+
 
 #	symbol=DAI name=Dai Stablecoin
 #'id': 'zulu-republic-token', 'symbol': 'ztx', 'name': 'Zulu Republic Token'
@@ -57,7 +62,8 @@ for i in range(len(df)) :
 		except:
 			pricetokenunit=0
 # not allways 100%, For example BLZ and contract 0x62450755160E9347DcF947da31AcC841E9668443 Iscariot (BLZ). Price should be 0
-		
+		if df.loc[i,"contractAddress"] == address:
+			pricetokenunit = float(loads(urlopen('https://api.coingecko.com/api/v3/coins/ethereum').read())['market_data']['current_price']['usd'])
 		pricetoken=pricetokenunit * df.loc[i,"real_value"]
 		currency = "${:,.2f}".format(pricetoken)
 		print(df.loc[i,"token_symbol"],df.loc[i,"real_value"], currency)
