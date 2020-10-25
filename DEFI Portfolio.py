@@ -5,9 +5,10 @@ import requests
 from json import loads
 import pandas as pd
 
-address ='0x9ec5e68f807b56befed7d99e9fcec6111845e7b7'
+#address ='0x9ec5e68f807b56befed7d99e9fcec6111845e7b7'
+address='0x82eaa009e9cae43955a3ef9d1de3bf68f5154200'
 
-df = pd.DataFrame() #columns=['contractAddress','token_symbol', 'value'])
+df = pd.DataFrame() 
 
 url = 'https://api.etherscan.io/api?module=account&action=tokentx&address='+address+'&startblock=0&endblock=999999999&sort=asc&apikey=YourApiKeyToken'
 response = requests.get(url)
@@ -35,7 +36,6 @@ if status == 200:
 
 url = 'https://api.etherscan.io/api?module=account&action=balance&address='+address+'&tag=latest&apikey=YourApiKeyToken'
 response = requests.get(url).json()
-
 status = requests.get(url).status_code
 if status == 200:
 	value = int(response['result'])
@@ -45,24 +45,18 @@ if status == 200:
 	real_value = value / 1000000000000000000
 	df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol, 'real_value':real_value}, ignore_index=True)
 
-
-
-#	symbol=DAI name=Dai Stablecoin
-#'id': 'zulu-republic-token', 'symbol': 'ztx', 'name': 'Zulu Republic Token'
 df=df.groupby(['token_symbol','contractAddress'],as_index=False).agg(sum)
 
-#problem tokens: AMPL and SoftLink
-#HEX2T not value in etherscan
+#problem tokens: AMPL 
+#HEX2T and SoftLink no price in etherscan
 
 for i in range(len(df)) :
-#	print(df.loc[i,"contractAddress"])
 	if df.loc[i,"real_value"] > 0.00001:
 		pricetokenunit=0
 		try:
 			pricetokenunit = float(loads(urlopen('https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=' + df.loc[i,"contractAddress"] +'&vs_currencies=usd').read())[df.loc[i,"contractAddress"]]['usd'])
 		except:
 			pricetokenunit=0
-# not allways 100%, For example BLZ and contract 0x62450755160E9347DcF947da31AcC841E9668443 Iscariot (BLZ). Price should be 0
 		if df.loc[i,"contractAddress"] == address:
 			pricetokenunit = float(loads(urlopen('https://api.coingecko.com/api/v3/coins/ethereum').read())['market_data']['current_price']['usd'])
 		pricetoken=pricetokenunit * df.loc[i,"real_value"]
@@ -70,6 +64,7 @@ for i in range(len(df)) :
 		print(df.loc[i,"token_symbol"],df.loc[i,"real_value"], currency)
 
 
+#'id': 'zulu-republic-token', 'symbol': 'ztx', 'name': 'Zulu Republic Token'
 #	print(df.loc[i,"contractAddress"])
 	#	"blockNumber":"10451980",
 	#	"timeStamp":"1594653491",
