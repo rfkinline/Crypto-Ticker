@@ -6,7 +6,7 @@ from json import loads
 import pandas as pd
 
 address ='0x9ec5e68f807b56befed7d99e9fcec6111845e7b7'
-
+address='0x03F2C52f1Cd2043AF5AD4B9C16B689B2B28bD8Ac'
 
 df = pd.DataFrame() #columns=['contractAddress','token_symbol', 'value'])
 
@@ -24,7 +24,7 @@ for transaction in result:
 	token_symbol = transaction.get("tokenSymbol")
 	gasprice = int(transaction.get("gasPrice"))
 	gasused = int(transaction.get("gasUsed"))
-	gasprice=gasused/1000000000*gasprice/1000000000
+	gasfee=gasused/1000000000*gasprice/1000000000
 	real_value = value * 10 ** (decimals * -1)
 	if tx_to == address.lower():
 		real_value = real_value
@@ -54,7 +54,7 @@ for i in range(len(df)) :
 
 
 #	print(df.loc[i,"contractAddress"])
-	#	[{"blockNumber":"10451980",
+	#	"blockNumber":"10451980",
 	#	"timeStamp":"1594653491",
 	#	"hash":"0x2b72e1e454ef895ddee5da46ec2a154a7460692d316fe87d15e2fab7bb1e4070",
 	#	"nonce":"0",
