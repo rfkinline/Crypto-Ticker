@@ -9,6 +9,7 @@ import pandas as pd
 address='0x82eaa009e9cae43955a3ef9d1de3bf68f5154200'
 
 df = pd.DataFrame() 
+#ValueError: invalid literal for int() with base 10: 'Max rate limit reached, please use API Key for higher rate limit'
 
 url = 'https://api.etherscan.io/api?module=account&action=tokentx&address='+address+'&startblock=0&endblock=999999999&sort=asc&apikey=YourApiKeyToken'
 response = requests.get(url)
