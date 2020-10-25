@@ -5,13 +5,17 @@ import requests
 from json import loads
 import pandas as pd
 
-#address ='0x9ec5e68f807b56befed7d99e9fcec6111845e7b7'
-address='0x82eaa009e9cae43955a3ef9d1de3bf68f5154200'
+#address ='0x9ec5e68f807b56befed7d99e9fcec6111845e7b7' #many
+#address='0x82eaa009e9cae43955a3ef9d1de3bf68f5154200'  #AMPL
+#address='0xb5eEcF93B18E3F03F0593B21f9fCb4E2f9b56cf3'  #a lot with value
+address = '0x15FF39F7BdA0eB22a38f56e379e3ded6A14f842D' # a few
 
+myapikey='Y79FNBQPI6AEZ72PTP2H4Y8KJ2WWEES5RU'
 df = pd.DataFrame() 
-#ValueError: invalid literal for int() with base 10: 'Max rate limit reached, please use API Key for higher rate limit'
 
-url = 'https://api.etherscan.io/api?module=account&action=tokentx&address='+address+'&startblock=0&endblock=999999999&sort=asc&apikey=YourApiKeyToken'
+#https://api.etherscan.io/api?module=account&action=balancemulti&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a,0x63a9975ba31b0b9626b34300f7f627147df1f526,0x198ef1ec325a96cc354c7266a038be8b5c558f67&tag=latest&apikey=YourApiKeyToken
+
+url = 'https://api.etherscan.io/api?module=account&action=tokentx&address='+address+'&startblock=0&endblock=999999999&sort=asc&apikey='+myapikey
 response = requests.get(url)
 status = requests.get(url).status_code
 if status == 200:
@@ -35,7 +39,7 @@ if status == 200:
 			real_value = (real_value * -1)
 		df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol, 'real_value':real_value}, ignore_index=True)
 
-url = 'https://api.etherscan.io/api?module=account&action=balance&address='+address+'&tag=latest&apikey=YourApiKeyToken'
+url = 'https://api.etherscan.io/api?module=account&action=balance&address='+address+'&tag=latest&apikey='+myapikey
 response = requests.get(url).json()
 status = requests.get(url).status_code
 if status == 200:
