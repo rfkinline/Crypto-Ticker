@@ -5,6 +5,9 @@ import requests
 from json import loads
 import pandas as pd
 
+#problem tokens: AMPL 
+#HEX2T and SoftLink no price in etherscan
+
 #address ='0x9ec5e68f807b56befed7d99e9fcec6111845e7b7' #many
 #address='0x82eaa009e9cae43955a3ef9d1de3bf68f5154200'  #AMPL
 #address='0xb5eEcF93B18E3F03F0593B21f9fCb4E2f9b56cf3'  #a lot with value
@@ -37,7 +40,7 @@ if status == 200:
 			real_value = real_value
 		else:
 			real_value = (real_value * -1)
-		df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol, 'real_value':real_value}, ignore_index=True)
+		df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol,'token_name':token_name, 'real_value':real_value}, ignore_index=True)
 
 url = 'https://api.etherscan.io/api?module=account&action=balance&address='+address+'&tag=latest&apikey='+myapikey
 response = requests.get(url).json()
@@ -48,12 +51,9 @@ if status == 200:
 	token_name = "Ethereum"
 	token_symbol = "ETH"
 	real_value = value / 1000000000000000000
-	df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol, 'real_value':real_value}, ignore_index=True)
+	df = df.append({'contractAddress':contractAddress, 'token_symbol':token_symbol,'token_name':token_name, 'real_value':real_value}, ignore_index=True)
 
-df=df.groupby(['token_symbol','contractAddress'],as_index=False).agg(sum)
-
-#problem tokens: AMPL 
-#HEX2T and SoftLink no price in etherscan
+df=df.groupby(['token_symbol','token_name','contractAddress'],as_index=False).agg(sum)
 
 for i in range(len(df)) :
 	if df.loc[i,"real_value"] > 0.00001:
@@ -64,30 +64,9 @@ for i in range(len(df)) :
 			pricetokenunit=0
 		if df.loc[i,"contractAddress"] == address:
 			pricetokenunit = float(loads(urlopen('https://api.coingecko.com/api/v3/coins/ethereum').read())['market_data']['current_price']['usd'])
-		pricetoken=pricetokenunit * df.loc[i,"real_value"]
-		currency = "${:,.2f}".format(pricetoken)
-		print(df.loc[i,"token_symbol"],df.loc[i,"real_value"], currency)
+		df.loc[i,"value"]=pricetokenunit * df.loc[i,"real_value"]
 
-
-#'id': 'zulu-republic-token', 'symbol': 'ztx', 'name': 'Zulu Republic Token'
-#	print(df.loc[i,"contractAddress"])
-	#	"blockNumber":"10451980",
-	#	"timeStamp":"1594653491",
-	#	"hash":"0x2b72e1e454ef895ddee5da46ec2a154a7460692d316fe87d15e2fab7bb1e4070",
-	#	"nonce":"0",
-	#	"blockHash":"0x1b28b88e744ffec253b91d68066295b7a1c9adb9b8046f22b027b06acb0184ae",
-	#	"from":"0x03f2c52f1cd2043af5ad4b9c16b689b2b28bd8ac",
-	#	"contractAddress":"0x0000000000004946c0e9f43f4dee607b0ef1fa1c",
-	#	"to":"0x0000000000000000000000000000000000000000",
-	#	"value":"0",
-	#	"tokenName":"Chi Gastoken by 1inch",
-	#	"tokenSymbol":"CHI",
-	#	"tokenDecimal":"0",
-	#	"transactionIndex":"148",
-	#	"gas":"659066",
-	#	"gasPrice":"73650000000",
-	#	"gasUsed":"402508",
-	#	"cumulativeGasUsed":"9759222",
-	#	"input":"deprecated",
-	#	"confirmations":"655728"},
-	#	print(transaction.get("gas"),transaction.get("gasPrice"),transaction.get("gasUsed"),transaction.get("cumulativeGasUsed"),transaction.get("timeStamp"), "R")
+df = df.nlargest(10,'value')
+for ind in df.index:
+		currency = "${:,.2f}".format(df['value'][ind])
+		print(df['token_name'][ind],df['real_value'][ind], currency)
