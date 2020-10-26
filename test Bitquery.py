@@ -20,3 +20,26 @@ for transaction in result:
 #	print 'Result - {}'.format(result)
 
  ["data"],["ethereum"],["address"],["balances"],["currency"],["symbol"]
+
+
+ #value = result['value']
+#a=json.dumps(result)
+#b=json.loads(a)
+#for row in b['data']['ethereum']:
+#       symbol = row["symbol"]
+#       value = str(row("value"))
+#       print(token_symbol, value)
+#       print(symbol)
+#       print('Result - {}'.format(row["data"],["ethereum$
+#       print (b["data"]["ethereum"]["address"]["balances$
+#       print ( 'Result - {}'.format(result))
+
+extracted_recipes = []
+for recipe in range(len(result)):
+  extracted_recipes.append({
+#            'symbol': recipe['symbol'],
+#            'value': recipe(['data']['ethereum']['addres$
+        })
+#  print (extracted_recipes)
+  print (recipe)
+
