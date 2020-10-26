@@ -11,7 +11,8 @@ import pandas as pd
 #address ='0x9ec5e68f807b56befed7d99e9fcec6111845e7b7' #many
 #address='0x82eaa009e9cae43955a3ef9d1de3bf68f5154200'  #AMPL
 #address='0xb5eEcF93B18E3F03F0593B21f9fCb4E2f9b56cf3'  #a lot with value
-address = '0x15FF39F7BdA0eB22a38f56e379e3ded6A14f842D' # a few
+#address = '0x15FF39F7BdA0eB22a38f56e379e3ded6A14f842D' # a few
+address='0x8998aC6F6d538207015F11E0aCfE7300FBa350E1' #AMPL 
 
 myapikey='Y79FNBQPI6AEZ72PTP2H4Y8KJ2WWEES5RU'
 df = pd.DataFrame() 
@@ -70,3 +71,4 @@ df = df.nlargest(10,'value')
 for ind in df.index:
 		currency = "${:,.2f}".format(df['value'][ind])
 		print(df['token_name'][ind],df['real_value'][ind], currency)
+
